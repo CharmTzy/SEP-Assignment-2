@@ -30,6 +30,42 @@
             document.addEventListener('DOMContentLoaded', function(){
                 member = JSON.parse(sessionStorage.getItem("member"));
 
+
+                document.getElementById("name").value = member.name;
+                document.getElementById("email").value = member.email;
+                document.getElementById("phone").value = member.phone;
+                
+                fetch(new Request('/api/getCountryByID/'+member.countryId, {
+                    method: 'GET'
+                })).then(function (response) {
+                    return response.json();
+                }).then(function (country) {
+                    document.getElementById("country-name").innerHTML = country.name;
+                }).catch(function (error) {
+                    console.log(error);
+                });
+
+                
+                document.getElementById("address").value = member.address;
+
+                let option1 = "<option value='1'>What is your mother's maiden name?</option>";
+                let option2 = "<option value='2'>What is your first pet's name?</option>";
+                let option3 = "<option value='3'>What is your favourite animal?</option>";
+
+                if (member.securityQuestion == 1) {
+                    document.getElementById("securityQuestion").innerHTML = option1 + option2 + option3;
+                } else if (member.securityQuestion == 2) {
+                    document.getElementById("securityQuestion").innerHTML = option2 + option1 + option3;
+                } else if (member.securityQuestion == 3) {
+                    document.getElementById("securityQuestion").innerHTML = option3 + option1 + option2;
+                } else {
+                    document.getElementById("securityQuestion").innerHTML = option1 + option2 + option3;
+                }
+
+                document.getElementById("securityAnswer").value = member.securityAnswer;
+                document.getElementById("age").value = member.age;
+                document.getElementById("income").value = member.income;
+
                 if(member.sla == 1) {
                     document.getElementById("serviceLevelAgreement").checked = true;
                 }
@@ -170,6 +206,15 @@
                     console.log(error);
                 });
             }, false);
+
+            function changeAns(value) {
+                if (value != member.securityQuestion) {
+                    document.getElementById("securityAnswer").value = "";
+                } else {
+                    console.log(true);
+                    document.getElementById("securityAnswer").value = member.securityAnswer;
+                }
+            }
 
             function addWorkDays(startDate, days) {
                 var dow = startDate.getDay();
@@ -316,20 +361,20 @@
                                         <h4>Personal Information</h4>
                                         <div class="form-group">
                                             <label>Name</label>
-                                            <input class="form-control" required="true" id="name" type="text" />
+                                            <input class="form-control" required="true" id="name" type="text" value=""/>
                                         </div>
                                         <div class="form-group">
                                             <label>E-mail Address</label>
-                                            <input class="form-control" required="true" id="email" disabled />
+                                            <input class="form-control" required="true" id="email" value="" disabled />
                                         </div>
                                         <div class="form-group">
                                             <label>Phone</label>
-                                            <input class="form-control" required="true" pattern="[0-9]*" title="Numbers only" type="text" id="phone" />
+                                            <input class="form-control" required="true" pattern="[0-9]*" title="Numbers only" type="text" id="phone" value=""/>
                                         </div>
                                         <div class="form-group">
                                             <label>Country</label>
                                             <select id="country">
-                                                <option value=""></option>
+                                                <option id="country-name" value=""></option>
                                                 <option value="Afganistan">Afghanistan</option>
                                                 <option value="Albania">Albania</option>
                                                 <option value="Algeria">Algeria</option>
@@ -581,24 +626,20 @@
                                         </div>
                                         <div class="form-group">
                                             <label>Address</label>
-                                            <input class="form-control" type="text" required="true" id="address" />
+                                            <input class="form-control" type="text" required="true" id="address" value=""/>
                                         </div>
                                         <div class="form-group">
                                             <label>Set Challenge Question</label>
-                                            <select id="securityQuestion">
-                                                <option value="1">What is your mother's maiden name?</option>
-                                                <option value="2">What is your first pet's name?</option>
-                                                <option value="3">What is your favourite animal?</option>
-                                            </select>
-                                            <input class="form-control" type="text" required="true" id="securityAnswer" />
+                                            <select id="securityQuestion" onchange="changeAns(value);"></select>
+                                            <input class="form-control" type="text" required="true" id="securityAnswer" value=""/>
                                         </div>
                                         <div class="form-group">
                                             <label>Age</label>
-                                            <input class="form-control" id="age" type="text" required="true" pattern="[0-9]*" title="Numbers only" />
+                                            <input class="form-control" id="age" type="text" required="true" pattern="[0-9]*" title="Numbers only" value=""/>
                                         </div>
                                         <div class="form-group">
                                             <label>Income per annum (in USD)</label>
-                                            <input class="form-control" id="income" type="text" required="true" pattern="[0-9]*" title="Money without cents" />
+                                            <input class="form-control" id="income" type="text" required="true" pattern="[0-9]*" title="Money without cents" value=""/>
                                         </div>
                                         <div class="form-group">
                                                <input style="cursor: pointer" type="checkbox" id="serviceLevelAgreement" value="agreement" />
